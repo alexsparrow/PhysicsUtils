@@ -76,7 +76,7 @@ p += Pattern("NW_N",
 			  0  , v9 , 0 ,
 			  0  , 0  , 0 ]
 	    )
-	
+
 p+=Pattern("N_NE",
 	   Taus = 0,
            Jets = 1,
@@ -112,7 +112,25 @@ p+=Pattern("W_SW",
 p+=Pattern("E_SE",
 	   Taus = 0,
 	   Jets = 1,
-	   EPattern = [ 0 , 0 , 0 ,
+	   EPattern = [ 0 , 0 ,  0 ,
 		        0 , v9 , v3 ,
-			0 , 0 , v3 ]
+			0 , 0 ,  v3 ]
 )
+
+p+=Patter("SW_S",
+          Taus=0,
+          Jets=1,
+          EPattern = [ 0 , 0 , 0 ,
+                       0 , v9 , 0 ,
+                       v3, v3 , 0 ]
+)
+
+p+=Pattern("S_SE",
+           Taus=0,
+           Jets=1,
+           EPattern = [ 0 , 0 , 0 ,
+                        0 , v9 , 0 ,
+                        0 , v3 , v3 ]
+)
+
+
