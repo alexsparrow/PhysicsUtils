@@ -81,9 +81,9 @@ class PatternList:
                 return False
         self.OutputPatterns()
         if not self.options.no_compile:
-            args=[self.gct_pat_maker,self.name+".dat"]
+            args=[self.gct_pat_maker,self.out_dir+"/"+self.name+".dat"]
             for p in self.patterns:
-                args.append("./%s/%s.txt" % (self.name,p.name))
+                args.append("./%s/%s/%s.txt" % (self.out_dir,self.name,p.name))
             subprocess.call(args)
             print args
         print "Patterns output in directory: %s" % self.name+"/"
@@ -112,9 +112,11 @@ class PatternList:
         if not pat.Taus==res["Taus"]:
             print "Pattern results don't match spec: Taus. Specified: %d, Expected: %d" % (pat.Taus,res["Taus"])
             good=False
+            print pat
         if not pat.Jets==res["Jets"]:
             print "Pattern results don't match spec: Jets. Specified: %d, Expected: %d" % (pat.Jets,res["Jets"])
             good=False
+            print pat
         return good
 
     def Eval3x3(self,pat):
@@ -135,6 +137,7 @@ class PatternList:
             for e_val in [nw,n,ne,w,e,sw,s,se]:
                 if e_val>self.NewTauAlgoThresh:
                     tau_ticker+=1
+
             if tau_ticker>1:
                 tau_veto=True
             else:
@@ -144,6 +147,7 @@ class PatternList:
                     if veto_val==1:
                         tau_veto=True
                         break
+
         ret={}
         if central_max:
             if tau_veto:
