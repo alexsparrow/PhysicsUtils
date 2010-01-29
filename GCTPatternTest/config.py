@@ -10,7 +10,7 @@ conf.placement=[ (12,0,1) , (12,2,0) , (12,2,1) ,
 conf.gct_pat_maker="/home/alex/GCTPatternMakerAddon/exe/master_pattern_generator"
 conf.out_dir="./patterns"
 conf.ecmd="rc"
-
+conf.taucmd="rctau"
 v9=100
 v0=0
 v1=10

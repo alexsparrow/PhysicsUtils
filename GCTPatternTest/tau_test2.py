@@ -100,10 +100,10 @@ for p in pats:
     i+=1
 
 master=l1+l2+l3+l4+l5+l6+l7+l8
-master.name="master"
+master.name="newtaualgo"
 master.Compile()
 
-master_tau_veto1=PatternList("master_tau_veto1",conf)
+master_tau_veto1=PatternList("newtaualgo_tau_veto1",conf)
 for pat in master.patterns:
     for tau_pos in [0,1,2,3,4]:
         pat2=Pattern(pat.name+"Tau"+str(tau_pos))
@@ -117,7 +117,7 @@ for pat in master.patterns:
 
 master_tau_veto1.Compile()
 
-master_tau_veto2=PatternList("master_tau_veto2",conf)
+master_tau_veto2=PatternList("newtaualgo_tau_veto2",conf)
 for pat in master.patterns:
     for tau_pos in [5,6,7,8]:
         pat2=Pattern(pat.name+"Tau"+str(tau_pos))

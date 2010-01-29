@@ -112,9 +112,9 @@ for p in pats:
 master2=l1+l2+l3
 master3=l4+l5
 master4=l6+l7+l8
-master2.name="master2_10_256_512_700"
+master2.name="newtaualgo_10_256_512_700_1"
 master2.Compile()
-master3.name="master3_10_256_512_700"
+master3.name="newtaualgo_10_256_512_700_2"
 master3.Compile()
-master4.name="master4_10_256_512_700"
+master4.name="newtaualgo_10_256_512_700_3"
 master4.Compile()

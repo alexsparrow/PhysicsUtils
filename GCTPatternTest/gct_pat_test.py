@@ -19,6 +19,7 @@ class PatternList:
         self.patterns=[]
         self.placement=conf.placement
         self.ecmd=conf.ecmd
+	self.taucmd=conf.taucmd
         self.gct_pat_maker=conf.gct_pat_maker
 	self.out_dir=conf.out_dir
         parser = OptionParser()
@@ -47,6 +48,15 @@ class PatternList:
                                     self.placement[i][2],
                                     e_val)
             i+=1
+        i=0    
+	for tau_val in pat.TauPattern:
+            if tau_val==1:
+	    	pstr+="%s %d %d %d %d\n" % (self.taucmd,
+					    self.placement[i][0],
+					    self.placement[1][1],
+					    self.placement[i][2],
+                                            1)
+            i+=1  
         return pstr
 
     def OutputPatterns(self):
@@ -147,7 +157,11 @@ class PatternList:
                     if veto_val==1:
                         tau_veto=True
                         break
-
+	else:
+	    for veto_val in pat.TauPattern:
+		if veto_val==1:
+			tau_veto=True
+			break
         ret={}
         if central_max:
             if tau_veto:
