@@ -174,8 +174,8 @@ class Config:
             conf.set(secname,k,getRaw(v[1],v[0]))
 
     def write(self):
-        with open(self.fname, 'wb') as configfile:
-            self.conf.write(configfile)
+        configfile=open(self.fname, 'wb')
+        self.conf.write(configfile)
 
     def readGlobals(self):
         self.readSection(self.conf,self.job_defaults,"DEFAULT")
