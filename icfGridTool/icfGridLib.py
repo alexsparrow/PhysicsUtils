@@ -74,6 +74,11 @@ class CrabJob:
             crab=crab.replace("__"+k+"__",str(getRaw(v[1],v[0])))
         f=open(path+"/crab.cfg","w+")
         f.write(crab)
+        self.path=path
+
+    def submit(self):
+        cmd="crab -create -submit all"
+
 
 class Job:
     def __init__(self,params):
@@ -142,8 +147,8 @@ class Config:
         conf=ConfigParser.RawConfigParser()
         Config.writeSection(conf,job_defaults,"DEFAULT")
         Config.writeSection(conf,global_defaults,"DEFAULT")
-        with open(fname, 'wb') as configfile:
-            conf.write(configfile)
+        configfile=open(fname, 'wb')
+        conf.write(configfile)
 
     @staticmethod
     def readSection(conf,params,secname):
