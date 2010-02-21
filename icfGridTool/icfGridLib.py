@@ -2,6 +2,7 @@
 from types import *
 import os,os.path
 import ConfigParser
+import subprocess
 
 global_defaults={
     "jobdir":(StringType,"./jobs","Job storage directory"),
@@ -77,8 +78,7 @@ class CrabJob:
         self.path=path
 
     def submit(self):
-        cmd="crab -create -submit all"
-
+        subprocess.call(["crab","-create","-submit"."all"])
 
 class Job:
     def __init__(self,params):
