@@ -87,9 +87,9 @@ class CrabJob:
 	return (p.returncode==0)
 
     def status(self):
-        p=subprocess.Popen(["crab","-cfg","crab.cfg","-status"],
+        p=subprocess.Popen(["crab","-status"],
                            cwd=self.path,
-                           stdout=PIPE)
+                           stdout=subprocess.PIPE)
         (out,err)=p.communicate(None)
         return out
 
