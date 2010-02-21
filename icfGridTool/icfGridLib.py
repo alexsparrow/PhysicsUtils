@@ -135,9 +135,8 @@ class Job:
         return "".join(strs)
 
     def crabCreate(self,glob,path):
-        if(os.path.exists(path)):
-            raise IOError("Path %s already exists" % path)
-        os.mkdir(path)
+        if not os.path.exists(path):
+            os.mkdir(path)
         c=CrabJob(self,glob,path)
         self.crab_job=c
         self.set("crabdir",path)

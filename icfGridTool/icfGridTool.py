@@ -75,6 +75,11 @@ class ICFGridTool(cmd.Cmd):
         if not name in self.jobs:
             print "ERROR: Unknown job: %s" % name
             return
+        crab_path=self.config.globals["jobdir"][1]+"/"+name
+        if os.path.exists(crab_path):
+            yn=raw_input("Path exists. Continue anyway? (y/n)")
+            if(yn!="y"):
+                return
         self.jobs[name].crabCreate(self.config.globals,
                                    self.config.globals["jobdir"][1]+
                                    "/"+name)
