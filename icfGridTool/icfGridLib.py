@@ -127,6 +127,10 @@ class CrabJob:
         (out,err)=p.communicate(None)
         jobs=self.parseStatus(out)
         self.subjobs=[]
+	self.fail_count=0
+	self.success_count=0
+	self.running_count=0
+	self.unknown_count=0
         for j in jobs:
             try:
                 jid=int(j[0])

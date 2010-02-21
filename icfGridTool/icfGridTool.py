@@ -130,6 +130,17 @@ class ICFGridTool(cmd.Cmd):
         for (name,j) in self.jobs.iteritems():
             print "%s\t%s\t%s" % (j.get("name"),j.get("sample"),j.get("status"))
         print header_eq
+    
+    def do_watch(self,arg=""):
+	while True:
+	    try:
+            	for (name,j) in self.jobs.iteritems():
+	    	     if j.get("status")=="CRAB Submitted":
+		     	j.crabStatus()
+			if not j.crab_job is None:
+				print "%s\t%s" % (name,j.crab_job.getStatus())
+	    except KeyboardInterrupt:
+		break
 
     def help_list(self):
         print "List jobs"
