@@ -3,6 +3,7 @@ import cmd,readline,os,os.path,sys
 from icfGridLib import *
 
 header_eq="="*50
+header80="="*80
 
 class ICFGridTool(cmd.Cmd):
     def __init__(self,config="./icf.cfg"):
@@ -104,9 +105,12 @@ class ICFGridTool(cmd.Cmd):
             print "ERROR: Unknown job: %s" % name
             return
          print "Running CRAB..."
-         print header_eq
-         ret=self.jobs[name].crabStatus()
-         print ret
+         jobs=self.jobs[name].crabStatus()
+         print "CRAB Jobs:"
+	 print header80
+	 for j in jobs:
+	    print "%s [%s]\t%s\t%s %s" % (j[0],j[1],j[2],j[3],j[4])
+	 print header80
 
     def do_list(self,name=""):
         print "Jobs:"
