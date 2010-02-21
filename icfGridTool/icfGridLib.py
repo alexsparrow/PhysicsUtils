@@ -86,11 +86,25 @@ class CrabJob:
 	p.wait()
 	return (p.returncode==0)
 
+    def parseStatus(self,ostr):
+        jobs=[]
+        lines=ostr.split("\n")
+        joblines=[]
+        joblist=False
+        for line in lines:
+            if line.beginswith("--------------"):
+                joblist=True
+            if line.strip().rstrip()=="":
+                joblist=False
+            if joblist:
+                job_lines.append(line)
+
     def status(self):
         p=subprocess.Popen(["crab","-status"],
                            cwd=self.path,
                            stdout=subprocess.PIPE)
         (out,err)=p.communicate(None)
+        jobs=parseStatus(out)
         return out
 
 class Job:
