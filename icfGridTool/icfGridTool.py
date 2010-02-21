@@ -72,7 +72,7 @@ class ICFGridTool(cmd.Cmd):
     def help_show(self):
         print "Show an individual job"
 
-    def do_crab_create(self,name):
+    def do_crab(self,name):
         if not name in self.jobs:
             print "ERROR: Unknown job: %s" % name
             return
@@ -86,7 +86,7 @@ class ICFGridTool(cmd.Cmd):
                                    "/"+name)
 	self.jobs[name].set("status","CRAB Created")
 
-    def do_crab_submit(self,name):
+    def do_submit(self,name):
         if not name in self.jobs:
             print "ERROR: Unknown job: %s" % name
             return
@@ -100,17 +100,27 @@ class ICFGridTool(cmd.Cmd):
 	else:
 	    print "CRAB submit error. Please try again."
 
-    def do_crab_status(self,name):
-         if not name in self.jobs:
+    def do_status(self,name):
+        if name=="":
+            print "Global Status:"
+            print header_eq
+            if len(self.jobs)==0:
+                print "No Jobs!"
+            for (n,j) in self.jobs.iteritems():
+                if not j.crab_job is None:
+                    print j.crab_job.getStatus()
+            print header_eq
+            return
+        if not name in self.jobs:
             print "ERROR: Unknown job: %s" % name
             return
-         print "Running CRAB..."
-         jobs=self.jobs[name].crabStatus()
-         print "CRAB Jobs:"
-	 print header80
-	 for j in jobs:
+        print "Running CRAB..."
+        jobs=self.jobs[name].crabStatus()
+        print "CRAB Jobs:"
+        print header80
+        for j in jobs:
 	    print "%s [%s]\t%s\t%s %s" % (j[0],j[1],j[2],j[3],j[4])
-	 print header80
+        print header80
 
     def do_list(self,name=""):
         print "Jobs:"
@@ -124,6 +134,11 @@ class ICFGridTool(cmd.Cmd):
     def help_list(self):
         print "List jobs"
 
+    def do_rm(self,name):
+        if not name in self.jobs:
+            print "ERROR: Unknown job: %s" % name
+            return
+        del self.jobs[name]
 
     def do_EOF(self, line):
         self.quit()
@@ -131,7 +146,7 @@ class ICFGridTool(cmd.Cmd):
     def help_EOF(self):
         print "Quits the program"
 
-    def save(self):
+    def do_save(self):
 	self.config.writeGlobals()
         self.config.writeJobs(self.jobs)
 

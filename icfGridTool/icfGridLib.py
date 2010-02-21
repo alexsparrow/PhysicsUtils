@@ -68,18 +68,26 @@ def getRaw(val,vtype):
         return val
 
 class CrabJob:
-    def __init__(self,job,glob,path):
+    def __init__(self,submitted,path):
+        self.path=path
+        self.subjobs=[]
+        self.success_count=0
+        self.fail_count=0
+        self.running_count=0
+        self.unknown_count=0
+        self.submitted=submitted
+
+    def setup(self,job,glob):
         f=open(job.get("crabtemplate"),"r")
         crab=f.read()
         for (k,v) in job.params.iteritems():
             crab=crab.replace("__"+k+"__",str(getRaw(v[1],v[0])))
         for(k,v) in glob.iteritems():
             crab=crab.replace("__"+k+"__",str(getRaw(v[1],v[0])))
-        f=open(path+"/crab.cfg","w+")
+        f=open(self.path+"/crab.cfg","w+")
         f.write(crab)
         shutil.copyfile(job.get("script"),
-                        path+"/"+os.path.split(job.get("script"))[1])
-        self.path=path
+                        self.path+"/"+os.path.split(job.get("script"))[1])
 
     def submit(self):
         p=subprocess.Popen(["crab","-cfg","crab.cfg","-create","-submit","all"],cwd=self.path)
@@ -100,18 +108,46 @@ class CrabJob:
 		      continue
                 jobs.append([x.strip().rstrip() for x in line.split()])
 	return jobs
-	
+
+    def getStatus(self):
+        if not submitted:
+            return "Not Submitted"
+        else:
+            return "%d jobs (%d succeeded, %d failed, %d running, %d unknown)"% (
+                len(self.subjobs),self.success_count,self.fail_count,
+                self.running_count,self.unknown_count)
+
     def status(self):
         p=subprocess.Popen(["crab","-status"],
                            cwd=self.path,
                            stdout=subprocess.PIPE)
         (out,err)=p.communicate(None)
         jobs=self.parseStatus(out)
+        self.subjobs=[]
+        for j in jobs:
+            try:
+                jid=int(j[0])
+            except:
+                print "Error parsing CRAB status"
+            if j[1] in ["Done","Cleared"]:
+                jstatus="Success"
+                self.success_count+=1
+            elif j[1] in ["Killed","Aborted","Done (Failed)"]:
+                jstatus="Failed"
+                self.fail_count+=1
+            elif j[1] in ["Running"]:
+                jstatus="Running"
+                self.running_count+=1
+            else:
+                jstatus="Unknown"
+                self.unknown_count+=1
+            self.subjobs.append((jid,jstatus))
         return jobs
 
 class Job:
     def __init__(self,params):
         self.params=params
+        self.crab_job=None
 
     def get(self,name):
         if not name in self.params:
@@ -156,7 +192,8 @@ class Job:
     def crabCreate(self,glob,path):
         if not os.path.exists(path):
             os.mkdir(path)
-        c=CrabJob(self,glob,path)
+        c=CrabJob(self,False,path)
+        c.setup(self,glob)
         self.crab_job=c
         self.set("crabdir",path)
 
@@ -227,7 +264,7 @@ class Config:
             jobs[job_name]=Job(job_params)
             if not job_params["crabdir"][1]=="":
                 jobs[job_name].crab_job=CrabJob(jobs[job_name],
-                                                self.globals,
+                                                job_params["status"]=="CRAB Submitted",
                                                 job_params["crabdir"][1])
         return jobs
 
