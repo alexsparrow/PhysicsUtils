@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-import cmd,readline,os,os.path
+import cmd,readline,os,os.path,sys
 from icfGridLib import *
 
 header_eq="="*50
@@ -76,6 +76,12 @@ class ICFGridTool(cmd.Cmd):
         self.jobs[name].crabCreate(self.config.globals,
                                    self.config.globals["jobdir"][1]+
                                    "/"+name)
+
+    def do_crab_submit(self,name):
+        if not name in self.jobs:
+            print "ERROR: Unknown job: %s" % name
+            return
+        self.jobs[name].crabSubmit()
 
     def do_list(self,name=""):
         print "Jobs:"

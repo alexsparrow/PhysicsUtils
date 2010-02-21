@@ -78,7 +78,7 @@ class CrabJob:
         self.path=path
 
     def submit(self):
-        subprocess.call(["crab","-create","-submit"."all"])
+        subprocess.call(["crab","-create","-submit","all"])
 
 class Job:
     def __init__(self,params):
