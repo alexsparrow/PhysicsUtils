@@ -33,7 +33,7 @@ class ICFGridTool(cmd.Cmd):
             return
         sample=myInput(StringType,"Dataset Path:")
         mcinfo=myInput(BooleanType,"Generate MC:")
-        j=Job(self.config.job_defaults)
+        j=Job(self.config.job_defaults.copy())
         print name
         j.set("name",name)
         j.set("sample",sample)
@@ -108,7 +108,7 @@ class ICFGridTool(cmd.Cmd):
                 print "No Jobs!"
             for (n,j) in self.jobs.iteritems():
                 if not j.crab_job is None:
-                    print j.crab_job.getStatus()
+                    print "%s\t%s" %(n,j.crab_job.getStatus())
             print header_eq
             return
         if not name in self.jobs:
@@ -146,7 +146,7 @@ class ICFGridTool(cmd.Cmd):
     def help_EOF(self):
         print "Quits the program"
 
-    def do_save(self):
+    def do_save(self,arg=""):
 	self.config.writeGlobals()
         self.config.writeJobs(self.jobs)
 
@@ -155,7 +155,7 @@ class ICFGridTool(cmd.Cmd):
         if(yn=="y" or yn=="n"):
             if(yn=="y"):
                 print "Saving state..."
-                self.save()
+                self.do_save()
             print "Bye!"
             sys.exit()
         else:

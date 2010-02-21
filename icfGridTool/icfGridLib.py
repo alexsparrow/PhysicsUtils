@@ -106,11 +106,14 @@ class CrabJob:
             if joblist:
 	 	if line.startswith("----------"):
 		      continue
-                jobs.append([x.strip().rstrip() for x in line.split()])
+                j=[x.strip().rstrip() for x in line.split()]
+		for i in range(len(j),5):
+			j.append("")
+		jobs.append(j)
 	return jobs
 
     def getStatus(self):
-        if not submitted:
+        if not self.submitted:
             return "Not Submitted"
         else:
             return "%d jobs (%d succeeded, %d failed, %d running, %d unknown)"% (
@@ -192,7 +195,7 @@ class Job:
     def crabCreate(self,glob,path):
         if not os.path.exists(path):
             os.mkdir(path)
-        c=CrabJob(self,False,path)
+        c=CrabJob(False,path)
         c.setup(self,glob)
         self.crab_job=c
         self.set("crabdir",path)
@@ -263,8 +266,7 @@ class Config:
                 raise KeyError("Duplicate job names detected")
             jobs[job_name]=Job(job_params)
             if not job_params["crabdir"][1]=="":
-                jobs[job_name].crab_job=CrabJob(jobs[job_name],
-                                                job_params["status"]=="CRAB Submitted",
+                jobs[job_name].crab_job=CrabJob(job_params["status"][1]=="CRAB Submitted",
                                                 job_params["crabdir"][1])
         return jobs
 
