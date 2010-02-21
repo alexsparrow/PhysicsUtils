@@ -3,6 +3,7 @@ from types import *
 import os,os.path
 import ConfigParser
 import subprocess
+import shutil
 
 global_defaults={
     "jobdir":(StringType,"./jobs","Job storage directory"),
@@ -76,6 +77,8 @@ class CrabJob:
             crab=crab.replace("__"+k+"__",str(getRaw(v[1],v[0])))
         f=open(path+"/crab.cfg","w+")
         f.write(crab)
+        shutil.copyfile(job.get("script"),
+                        path+"/"+os.path.split(job.get("script"))[1])
         self.path=path
 
     def submit(self):
