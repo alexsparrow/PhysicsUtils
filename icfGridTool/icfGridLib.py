@@ -78,8 +78,14 @@ class CrabJob:
         self.path=path
 
     def submit(self):
-        subprocess.call(["crab","-create","-submit","all"])
-
+        p=subprocess.Popen(["crab","-cfg","crab.cfg","-create","-submit","all"],cwd=self.path)
+	p.wait()
+	return p.returncode==0
+    
+    def status(self):
+        p=subprocess.Popen(["crab","-cfg","crab.cfg","-status"],cwd=self.path)
+	p.wait()
+	
 class Job:
     def __init__(self,params):
         self.params=params

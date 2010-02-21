@@ -76,12 +76,21 @@ class ICFGridTool(cmd.Cmd):
         self.jobs[name].crabCreate(self.config.globals,
                                    self.config.globals["jobdir"][1]+
                                    "/"+name)
+	self.jobs[name].set("status","CRAB Created")
 
     def do_crab_submit(self,name):
         if not name in self.jobs:
             print "ERROR: Unknown job: %s" % name
             return
-        self.jobs[name].crabSubmit()
+        print "Running CRAB..."
+	print header_eq
+	ret=self.jobs[name].crabSubmit()
+	print header_eq
+	if ret:
+	    print "CRAB submit completed successfully."
+	    self.jobs[name].set("status","CRAB Submitted")	
+	else:
+	    print "CRAB submit error. Please try again."
 
     def do_list(self,name=""):
         print "Jobs:"
@@ -102,6 +111,8 @@ class ICFGridTool(cmd.Cmd):
     def help_EOF(self):
         print "Quits the program"
 
+    def quit(self):
+	
 if __name__=="__main__":
     tool=ICFGridTool()
     tool.cmdloop()
