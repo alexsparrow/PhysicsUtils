@@ -1,3 +1,5 @@
 GCTPatternTest/patterns
+GCTPatternTest/patterns_pciccms04
 *.pyc
 .#*
+GCTPatternTest/random_patterns
