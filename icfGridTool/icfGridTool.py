@@ -14,6 +14,8 @@ class ICFGridTool(cmd.Cmd):
             print "Generating defaults."
             Config.initDefault(config)
         self.config=Config(config)
+        self.config.readGlobals()
+        self.jobs=self.config.readJobs()
         print "Config:"
         print header_eq
         self.config.printGlobals()
@@ -88,7 +90,7 @@ class ICFGridTool(cmd.Cmd):
 	print header_eq
 	if ret:
 	    print "CRAB submit completed successfully."
-	    self.jobs[name].set("status","CRAB Submitted")	
+	    self.jobs[name].set("status","CRAB Submitted")
 	else:
 	    print "CRAB submit error. Please try again."
 
@@ -106,13 +108,26 @@ class ICFGridTool(cmd.Cmd):
 
 
     def do_EOF(self, line):
-        sys.exit()
+        self.quit()
 
     def help_EOF(self):
         print "Quits the program"
 
+    def save(self):
+	self.config.writeGlobals()
+        self.config.writeJobs(self.jobs)
+
     def quit(self):
-	
+        yn=raw_input("Save state before quitting? (y/n/c)")
+        if(yn=="y" or yn=="n"):
+            if(yn=="y"):
+                print "Saving state..."
+                self.save()
+            print "Bye!"
+            sys.exit()
+        else:
+            return
+
 if __name__=="__main__":
     tool=ICFGridTool()
     tool.cmdloop()

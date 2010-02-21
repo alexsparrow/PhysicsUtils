@@ -81,11 +81,11 @@ class CrabJob:
         p=subprocess.Popen(["crab","-cfg","crab.cfg","-create","-submit","all"],cwd=self.path)
 	p.wait()
 	return p.returncode==0
-    
+
     def status(self):
         p=subprocess.Popen(["crab","-cfg","crab.cfg","-status"],cwd=self.path)
 	p.wait()
-	
+
 class Job:
     def __init__(self,params):
         self.params=params
@@ -195,7 +195,7 @@ class Config:
         jobs={}
         for s in self.conf.sections():
             job_params=self.job_defaults.copy()
-            self.readSection(job_params,s)
+            self.readSection(self.conf,job_params,s)
             job_name=job_params["name"][1]
             if job_name in jobs:
                 raise KeyError("Duplicate job names detected")
