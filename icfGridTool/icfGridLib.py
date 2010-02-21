@@ -84,7 +84,8 @@ class CrabJob:
     def submit(self):
         p=subprocess.Popen(["crab","-cfg","crab.cfg","-create","-submit","all"],cwd=self.path)
 	p.wait()
-	return p.returncode==0
+        print p.returncode
+	return (p.returncode==0)
 
     def status(self):
         p=subprocess.Popen(["crab","-cfg","crab.cfg","-status"],cwd=self.path)
