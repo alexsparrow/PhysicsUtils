@@ -84,7 +84,6 @@ class CrabJob:
     def submit(self):
         p=subprocess.Popen(["crab","-cfg","crab.cfg","-create","-submit","all"],cwd=self.path)
 	p.wait()
-        print p.returncode
 	return (p.returncode==0)
 
     def status(self):
@@ -143,7 +142,7 @@ class Job:
         self.set("crabdir",path)
 
     def crabSubmit(self):
-        self.crab_job.submit()
+        return self.crab_job.submit()
 
 class Config:
     def __init__(self,fname):
