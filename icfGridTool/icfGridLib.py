@@ -25,7 +25,8 @@ job_defaults={
     "storagepath":(StringType,"/castor/cern.ch","Crab storage path."),
     "userremotedir":(StringType,"","Crab user remote directory."),
     "storageelement":(StringType,"srm-cms.cern.ch","Crab storage element."),
-    "status":(StringType,"CREATED","Job status")
+    "status":(StringType,"CREATED","Job status"),
+    "crabdir":(StringType,"","Path to CRAB directory")
 }
 
 def myInput(vtype,name):
@@ -136,6 +137,7 @@ class Job:
         os.mkdir(path)
         c=CrabJob(self,glob,path)
         self.crab_job=c
+        self.set("crabdir",path)
 
     def crabSubmit(self):
         self.crab_job.submit()
@@ -200,6 +202,10 @@ class Config:
             if job_name in jobs:
                 raise KeyError("Duplicate job names detected")
             jobs[job_name]=Job(job_params)
+            if not job_params["crabdir"][1]=="":
+                jobs[job_name].crab_job=CrabJob(jobs[job_name],
+                                                self.globals,
+                                                job_params["crabdir"][1])
         return jobs
 
     def writeJobs(self,jobs):
