@@ -99,6 +99,15 @@ class ICFGridTool(cmd.Cmd):
 	else:
 	    print "CRAB submit error. Please try again."
 
+    def do_crab_status(self,name):
+         if not name in self.jobs:
+            print "ERROR: Unknown job: %s" % name
+            return
+         print "Running CRAB..."
+         print header_eq
+         ret=self.jobs[name].crabStatus()
+         print ret
+
     def do_list(self,name=""):
         print "Jobs:"
         print header_eq

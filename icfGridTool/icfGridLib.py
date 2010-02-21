@@ -87,8 +87,11 @@ class CrabJob:
 	return (p.returncode==0)
 
     def status(self):
-        p=subprocess.Popen(["crab","-cfg","crab.cfg","-status"],cwd=self.path)
-	p.wait()
+        p=subprocess.Popen(["crab","-cfg","crab.cfg","-status"],
+                           cwd=self.path,
+                           stdout=PIPE)
+        (out,err)=p.communicate(None)
+        return out
 
 class Job:
     def __init__(self,params):
@@ -144,6 +147,8 @@ class Job:
     def crabSubmit(self):
         return self.crab_job.submit()
 
+    def crabStatus(self):
+        return self.crab_job.status()
 class Config:
     def __init__(self,fname):
         self.conf=ConfigParser.RawConfigParser()
