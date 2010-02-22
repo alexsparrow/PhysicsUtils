@@ -124,8 +124,7 @@ def castorListPattern(path,pattern):
     files=[]
     for line in out.split("\n"):
         fields=line.split()
-        print fields
-        if ( fields[8].startswith(pattern) or pattern=="") and (fields[0][0]!="d"):
+        if len(fields) and (fields[8].startswith(pattern) or pattern=="") and (fields[0][0]!="d"):
             files.append(fields[8])
     return files
 
