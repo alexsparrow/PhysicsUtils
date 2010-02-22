@@ -150,7 +150,7 @@ class ICFGridTool(cmd.Cmd):
         if not name in self.jobs:
             print "ERROR: Unknown job: %s" % name
             return
-        if self.jobs[name].crab_job==None:
+        if self.jobs[name].crab_job==None or self.jobs[name].crab_job.submitted==False:
             print "Not yet submitted"
             return
         self.jobs[name].crabStatus()
@@ -206,6 +206,20 @@ class ICFGridTool(cmd.Cmd):
                                            self.config.globals[param][2])
         else:
             print "Configuration paramater '%s' not found" % param
+
+    def do_fetch(self,name):
+        if not name in self.jobs:
+            print "ERROR: Unknown job: %s" % name
+            return
+        if self.jobs[name].crab_job==None:
+            print "Not yet created"
+            return
+        pattern=raw_input("Enter pattern:")
+        dest=raw_input("Enter destination:")
+        castorFetchPattern(self.jobs[name].get("storagepath")+
+                           self.jobs[name].get("userremotedir"),
+                           dest,
+                           pattern)
 
     def do_EOF(self, line):
         self.quit()

@@ -110,6 +110,32 @@ def castorDir(path):
     except Exception,e:
         print e
 
+def rfcp(src,dest):
+    p=subprocess.Popen(["rfcp",src,dest])
+    p.wait()
+    return (p.returncode==0)
+
+def castorListPattern(path,pattern):
+    p=subprocess.Popen(["rfdir",path])
+    (out,err)=p.communicate()
+    files=[]
+    for line in out:
+        fields=line.split()
+        if ( fields[8].startswith(pattern) or pattern=="") and (fields[0][0]!="d"):
+            files.append(fields[8])
+    return files
+
+def castorFetchPattern(src,dest,pattern):
+    files=castorListPattern(src,pattern)
+    if not dest.endswith("/"):
+        dest=dest+"/"
+    for f in files:
+        if not os.path.exist(dest+f):
+            print "Copying file %s" %f
+            if not rfcp(src,dest+"/"+f):
+                print "Error copying file"
+                return False
+    return True
 
 class CrabJob:
     def __init__(self,submitted,path):
