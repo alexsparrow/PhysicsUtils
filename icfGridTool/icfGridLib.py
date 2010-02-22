@@ -116,7 +116,7 @@ def rfcp(src,dest):
     return (p.returncode==0)
 
 def castorListPattern(path,pattern):
-    p=subprocess.Popen(["rfdir",path])
+    p=subprocess.Popen(["rfdir",path],stdout=subprocess.PIPE)
     (out,err)=p.communicate()
     if not p.returncode==0:
         print "Error fetching dir %s" %path
