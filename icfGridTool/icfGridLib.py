@@ -134,10 +134,12 @@ def castorFetchPattern(src,dest,pattern):
         return
     if not dest.endswith("/"):
         dest=dest+"/"
+    if not src.endswith("/"):
+        src=src+"/"
     for f in files:
         if not os.path.exists(dest+f):
             print "Copying file %s" %f
-            if not rfcp(src,dest+"/"+f):
+            if not rfcp(src+f,dest+"/"+f):
                 print "Error copying file"
                 return False
     return True
