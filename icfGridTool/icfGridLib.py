@@ -278,6 +278,9 @@ class Config:
         return jobs
 
     def writeJobs(self,jobs):
+        for s in self.conf.sections():
+            if not s in jobs:
+                self.conf.remove_section(name)
         for (k,v) in jobs.iteritems():
             if not self.conf.has_section(k):
                 self.conf.add_section(k)
