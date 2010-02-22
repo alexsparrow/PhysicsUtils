@@ -60,7 +60,7 @@ class ICFGridTool(cmd.Cmd):
         if not name in self.jobs:
             print "ERROR: Unknown job: %s" % name
             return
-        castorDir(job.get("storagepath")[:-1]+job.get("userremotedir"))
+        castorDir(self.jobs[name].get("storagepath")[:-1]+self.jobs[name].get("userremotedir"))
 
     def help_create(self):
         print "Create a job"
