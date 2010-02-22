@@ -140,6 +140,15 @@ class ICFGridTool(cmd.Cmd):
 	    print "%s [%s]\t%s\t%s %s" % (j[0],j[1],j[2],j[3],j[4])
         print header80
 
+    def do_stat(self,name):
+        if not name in self.jobs:
+            print "ERROR: Unknown job: %s" % name
+            return
+        if jobs[name].crab_job==None:
+            print "Not yet submitted"
+            return
+        self.jobs[name].crabStatus()
+        print "%s\t%s" %(n,self.jobs[name].crab_job.getStatus())
     def do_list(self,name=""):
         print "Jobs:"
         print header_eq
