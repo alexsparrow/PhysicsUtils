@@ -148,7 +148,7 @@ class ICFGridTool(cmd.Cmd):
             print "Not yet submitted"
             return
         self.jobs[name].crabStatus()
-        print "%s\t%s" %(n,self.jobs[name].crab_job.getStatus())
+        print "%s\t%s" %(name,self.jobs[name].crab_job.getStatus())
 
     def do_list(self,name=""):
         print "Jobs:"
