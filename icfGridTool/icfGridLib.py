@@ -266,7 +266,7 @@ class Config:
     def readJobs(self):
         jobs={}
         for s in self.conf.sections():
-            job_params=self.job_defaults.copy()
+            job_params=self.default_job.params.copy()
             self.readSection(self.conf,job_params,s)
             job_name=job_params["name"][1]
             if job_name in jobs:
