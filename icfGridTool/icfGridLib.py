@@ -103,7 +103,7 @@ def castorCreate(path):
         print e
         return False
 
-def castorDir(self,path):
+def castorDir(path):
     try:
         p=subprocess.Popen(["rfdir",path])
         p.wait()
@@ -303,7 +303,7 @@ class Config:
     def writeJobs(self,jobs):
         for s in self.conf.sections():
             if not s in jobs:
-                self.conf.remove_section(name)
+                self.conf.remove_section(s)
         for (k,v) in jobs.iteritems():
             if not self.conf.has_section(k):
                 self.conf.add_section(k)
