@@ -144,11 +144,12 @@ class ICFGridTool(cmd.Cmd):
         if not name in self.jobs:
             print "ERROR: Unknown job: %s" % name
             return
-        if jobs[name].crab_job==None:
+        if self.jobs[name].crab_job==None:
             print "Not yet submitted"
             return
         self.jobs[name].crabStatus()
         print "%s\t%s" %(n,self.jobs[name].crab_job.getStatus())
+
     def do_list(self,name=""):
         print "Jobs:"
         print header_eq
