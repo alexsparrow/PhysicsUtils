@@ -103,6 +103,14 @@ def castorCreate(path):
         print e
         return False
 
+def castorDir(self,path):
+    try:
+        p=subprocess.Popen(["rfdir",path])
+        p.wait()
+    except Exception,e:
+        print e
+
+
 class CrabJob:
     def __init__(self,submitted,path):
         self.path=path
