@@ -56,7 +56,7 @@ class ICFGridTool(cmd.Cmd):
         if yn=="y":
             castorCreate(folder)
 
-    def do_dir(self,job):
+    def do_dir(self,name):
         if not name in self.jobs:
             print "ERROR: Unknown job: %s" % name
             return
