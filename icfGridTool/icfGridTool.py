@@ -163,7 +163,7 @@ class ICFGridTool(cmd.Cmd):
         print "Edit Config:"
         if param in self.config.default_job.params:
             value=myInput(self.config.default_job.params[param][0],
-                      "New value (previous='%s'):" % self.config.default_job.getRaw(param))
+                      "New value (previous='%s'):" % getRaw(self.config.default_jobs.params[param][1],self.config.default_job.params[param][0]))
             self.config.default_job.set(param,value)
 
         elif param in self.config.globals:
