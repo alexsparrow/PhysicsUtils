@@ -88,6 +88,21 @@ def setRaw(val,vtype):
                                                        str(vtype),
                                                        value)
             raise ValueError(msg)
+
+def castorCreate(path):
+    try:
+        p=subprocess.Popen(["rfmkdir",path])
+        p.wait()
+        if p.returncode==0:
+            p=subprocess.popen(["rfchmod","775",path])
+            p.wait()
+            if p.returncode==0:
+                return True
+        return False
+    except Exception,e:
+        print e
+        return False
+
 class CrabJob:
     def __init__(self,submitted,path):
         self.path=path

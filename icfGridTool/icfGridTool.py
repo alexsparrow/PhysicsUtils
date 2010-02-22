@@ -25,6 +25,13 @@ class ICFGridTool(cmd.Cmd):
     def emptyline(self):
         pass
 
+    def completedefault(self,text,line,begidx,endidx):
+        j=[]
+        for (k,v) in self.jobs.iteritems():
+            if k.startswith(text):
+                j.append(k)
+        return j
+
     def do_create(self,name=""):
         print "Create Job:"
         name=myInput(StringType,"Name:")
@@ -33,12 +40,21 @@ class ICFGridTool(cmd.Cmd):
             return
         sample=myInput(StringType,"Dataset Path:")
         mcinfo=myInput(BooleanType,"Generate MC:")
+        remotedir=myInput(StringType,"Remote Dir:")
         j=Job(self.config.default_job.params.copy())
         print name
         j.set("name",name)
         j.set("sample",sample)
         j.set("mcinfo",mcinfo)
+        j.set("userremotedir",remotedir)
         self.jobs[name]=j
+
+    def do_castor(self,folder):
+        if "CASTOR_HOME" in os.environ:
+            folder=folder.replace("~",os.environ["CASTOR_HOME"])
+        yn=raw_input("Create CASTOR directory '%s'? (y/n) :" %folder)
+        if yn=="y":
+            castorCreate(folder)
 
     def help_create(self):
         print "Create a job"
