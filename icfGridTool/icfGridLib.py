@@ -118,6 +118,9 @@ def rfcp(src,dest):
 def castorListPattern(path,pattern):
     p=subprocess.Popen(["rfdir",path])
     (out,err)=p.communicate()
+    if not p.returncode==0:
+        print "Error fetching dir %s" %path
+        return None
     files=[]
     for line in out:
         fields=line.split()
@@ -127,6 +130,8 @@ def castorListPattern(path,pattern):
 
 def castorFetchPattern(src,dest,pattern):
     files=castorListPattern(src,pattern)
+    if files=None:
+        return
     if not dest.endswith("/"):
         dest=dest+"/"
     for f in files:
