@@ -94,7 +94,7 @@ def castorCreate(path):
         p=subprocess.Popen(["rfmkdir",path])
         p.wait()
         if p.returncode==0:
-            p=subprocess.popen(["rfchmod","775",path])
+            p=subprocess.Popen(["rfchmod","775",path])
             p.wait()
             if p.returncode==0:
                 return True
