@@ -98,6 +98,7 @@ class ICFGridTool(cmd.Cmd):
 	    print "CRAB submit completed successfully."
 	    self.jobs[name].set("status","CRAB Submitted")
             self.jobs[name].crab_job.submitted=True
+            self.do_save()
 	else:
 	    print "CRAB submit error. Please try again."
 

@@ -188,7 +188,7 @@ class Job:
     def set(self,name,value):
         if not name in self.params:
             raise KeyError("Paramater not found: %s" % name)
-        self._set(name,setRaw(value,self.params[0]))
+        self._set(name,setRaw(value,self.params[name][0]))
 
     def __repr__(self):
         strs=[]
