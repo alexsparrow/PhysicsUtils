@@ -67,6 +67,27 @@ def getRaw(val,vtype):
     else:
         return val
 
+def setRaw(val,vtype):
+    if type(val)==vtype:
+        return val
+    elif type(val)==StringType:
+        if vtype==IntType:
+            return int(value)
+        elif vtype==BooleanType:
+            if value=="1":
+                return True
+            elif value=="0":
+                self.set(name,False)
+            else:
+                msg="Invalid literal for boolean %s ('%s')" % (name, value)
+                raise ValueError(msg)
+        else:
+            print str(type(value))
+            print str(vtype)
+            msg="Invalid literal for %s (%s) : '%s'" %(name,
+                                                       str(vtype),
+                                                       value)
+            raise ValueError(msg)
 class CrabJob:
     def __init__(self,submitted,path):
         self.path=path
@@ -167,26 +188,7 @@ class Job:
     def set(self,name,value):
         if not name in self.params:
             raise KeyError("Paramater not found: %s" % name)
-        if type(value)==self.params[name][0]:
-            self._set(name,value)
-        elif type(value)=="str":
-            if self.params[name][0]=="int":
-                self._set(name,int(value))
-            elif self.params[name][0]=="bool":
-                if value=="1":
-                    self._set(name,True)
-                elif value=="0":
-                    self.set(name,False)
-                else:
-                    msg="Invalid literal for boolean %s ('%s')" % (name, value)
-                    raise ValueError(msg)
-        else:
-            print str(type(value))
-            print self.params[name][0]
-            msg="Invalid literal for %s (%s) : '%s'" %(name,
-                                                       self.params[name][0],
-                                                       value)
-            raise ValueError(msg)
+        self._set(name,setRaw(value,self.params[0]))
 
     def __repr__(self):
         strs=[]
@@ -209,11 +211,12 @@ class Job:
 
     def crabStatus(self):
         return self.crab_job.status()
+
 class Config:
     def __init__(self,fname):
         self.conf=ConfigParser.RawConfigParser()
         self.conf.read(fname)
-        self.job_defaults=job_defaults
+        self.default_job=Job(job_defaults)
         self.globals=global_defaults
         self.fname=fname
 
@@ -253,11 +256,11 @@ class Config:
         self.conf.write(configfile)
 
     def readGlobals(self):
-        self.readSection(self.conf,self.job_defaults,"DEFAULT")
+        self.readSection(self.conf,self.default_job.params,"DEFAULT")
         self.readSection(self.conf,self.globals,"DEFAULT")
 
     def writeGlobals(self):
-        self.writeSection(self.conf,self.job_defaults,"DEFAULT")
+        self.writeSection(self.conf,self.default_job.params,"DEFAULT")
         self.writeSection(self.conf,self.globals,"DEFAULT")
 
     def readJobs(self):
@@ -282,7 +285,7 @@ class Config:
         self.write()
 
     def printGlobals(self):
-        for (k,v) in self.job_defaults.iteritems():
+        for (k,v) in self.default_job.params.iteritems():
             print "%s = %s" % (k,v[1])
         for (k,v) in self.globals.iteritems():
             print "%s = %s" % (k,v[1])

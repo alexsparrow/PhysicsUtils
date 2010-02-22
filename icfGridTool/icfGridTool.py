@@ -33,7 +33,7 @@ class ICFGridTool(cmd.Cmd):
             return
         sample=myInput(StringType,"Dataset Path:")
         mcinfo=myInput(BooleanType,"Generate MC:")
-        j=Job(self.config.job_defaults.copy())
+        j=Job(self.config.default_job.params.copy())
         print name
         j.set("name",name)
         j.set("sample",sample)
@@ -130,7 +130,7 @@ class ICFGridTool(cmd.Cmd):
         for (name,j) in self.jobs.iteritems():
             print "%s\t%s\t%s" % (j.get("name"),j.get("sample"),j.get("status"))
         print header_eq
-    
+
     def do_watch(self,arg=""):
 	while True:
 	    try:
@@ -150,6 +150,28 @@ class ICFGridTool(cmd.Cmd):
             print "ERROR: Unknown job: %s" % name
             return
         del self.jobs[name]
+
+    def do_config(self,param):
+        if param=="":
+            print "Config:"
+            print header_eq
+            self.config.printGlobals()
+            print header_eq
+            return
+        print "Edit Config:"
+        if param in self.config.default_job.params:
+            value=myInput(self.config.default_job.params[param][0],
+                      "New value (previous='%s'):" % self.config.default_job.getRaw(param))
+            self.config.default_job.set(param,value)
+
+        elif param in self.config.globals:
+            value=myInput(self.config.globals[param][0],
+                          "New value (previous='%s'):" % getRaw(self.config.globals[param][1],self.config.globals[param][0]))
+            self.config.globals[param]=(self.config.globals[param][0],
+                                           setRaw(value,self.config.globals[param][0]),
+                                           self.config.globals[param][2])
+        else:
+            print "Configuration paramater '%s' not found" % param
 
     def do_EOF(self, line):
         self.quit()
