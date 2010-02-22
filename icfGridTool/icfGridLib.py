@@ -122,7 +122,7 @@ def castorListPattern(path,pattern):
         print "Error fetching dir %s" %path
         return None
     files=[]
-    for line in out:
+    for line in out.split("\n"):
         fields=line.split()
         if ( fields[8].startswith(pattern) or pattern=="") and (fields[0][0]!="d"):
             files.append(fields[8])
