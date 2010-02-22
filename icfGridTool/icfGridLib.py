@@ -130,7 +130,7 @@ def castorListPattern(path,pattern):
 
 def castorFetchPattern(src,dest,pattern):
     files=castorListPattern(src,pattern)
-    if files=None:
+    if files==None:
         return
     if not dest.endswith("/"):
         dest=dest+"/"
