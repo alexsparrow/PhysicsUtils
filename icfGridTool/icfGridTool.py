@@ -241,7 +241,7 @@ class ICFGridTool(cmd.Cmd):
          path = castorReplace(path)
          self.jobs[name].set("outfile", path)
 
-    def do_clear(self, job):
+    def do_clear(self, name):
         if not name in self.jobs:
             print "ERROR: Unknown job: %s" % name
             return
