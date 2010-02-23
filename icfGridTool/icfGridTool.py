@@ -251,8 +251,10 @@ class ICFGridTool(cmd.Cmd):
             path+="/"
         for f in castorListPattern(path, name):
             if not (path + f) == self.jobs[name].get("outfile"):
-                if "yn" == raw_input("Delete file '%s'? (y/n)" % (path + f)):
+                if "y" == raw_input("Delete file '%s'? (y/n):" % (path + f)):
                     rfrm(path+f)
+                else:
+                    print "Skipping file %s" % (path+f)
 
     def do_EOF(self, line):
         self.quit()
