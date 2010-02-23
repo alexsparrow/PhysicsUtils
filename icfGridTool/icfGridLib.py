@@ -29,7 +29,8 @@ job_defaults = {
     "userremotedir": (StringType, "", "Crab user remote directory."),
     "storageelement": (StringType, "srm-cms.cern.ch", "Crab storage element."),
     "status": (StringType, "CREATED", "Job status"),
-    "crabdir": (StringType, "", "Path to CRAB directory")}
+    "crabdir": (StringType, "", "Path to CRAB directory"),
+    "outfile": (StringType, "", "Final produced ntuple file")}
 
 
 def myInput(vtype, name):
@@ -93,6 +94,11 @@ def setRaw(val, vtype):
                                                        value)
             raise ValueError(msg)
 
+def castorReplace(path):
+    tmp=path
+    if "CASTOR_HOME" in os.environ:
+        tmp = tmp.replace("~", os.environ["CASTOR_HOME"])
+    return tmp
 
 def castorCreate(path):
     try:
@@ -122,6 +128,11 @@ def rfcp(src, dest):
     p.wait()
     return (p.returncode == 0)
 
+
+def rfrm(path):
+    p = subprocess.Popen("rfrm", path)
+    p.wait()
+    return (p.returncode==0)
 
 def castorListPattern(path, pattern):
     p = subprocess.Popen(["rfdir", path], stdout=subprocess.PIPE)

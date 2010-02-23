@@ -54,8 +54,7 @@ class ICFGridTool(cmd.Cmd):
         self.jobs[name] = j
 
     def do_castor(self, folder):
-        if "CASTOR_HOME" in os.environ:
-            folder = folder.replace("~", os.environ["CASTOR_HOME"])
+        folder=castorReplace(folder)
         yn = raw_input("Create CASTOR directory '%s'? (y/n) :" % folder)
         if yn == "y":
             castorCreate(folder)
@@ -233,6 +232,27 @@ class ICFGridTool(cmd.Cmd):
                            self.jobs[name].get("userremotedir"),
                            dest,
                            pattern)
+
+    def do_register(self, job):
+         if not name in self.jobs:
+            print "ERROR: Unknown job: %s" % name
+            return
+         path = raw_input("Enter CASTOR path:")
+         path = castorReplace(path)
+         self.jobs[name].set("outfile", path)
+
+    def do_clear(self, job):
+        if not name in self.jobs:
+            print "ERROR: Unknown job: %s" % name
+            return
+        path = (self.jobs[name].get("storeagepath") +
+                self.jobs[name].get("userremotedir"))
+        if not path.endswith("/"):
+            path+="/"
+        for f in castorListPattern(path, name):
+            if not (path + f) == self.jobs[name].get("outfile"):
+                if "yn" == raw_input("Delete file '%s'? (y/n)" % (path + f)):
+                    rfrm(path+f)
 
     def do_EOF(self, line):
         self.quit()
