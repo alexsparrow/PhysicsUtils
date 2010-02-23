@@ -130,7 +130,7 @@ def rfcp(src, dest):
 
 
 def rfrm(path):
-    p = subprocess.Popen("rfrm", path)
+    p = subprocess.Popen(["rfrm", path])
     p.wait()
     return (p.returncode==0)
 
