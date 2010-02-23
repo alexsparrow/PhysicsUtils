@@ -245,7 +245,7 @@ class ICFGridTool(cmd.Cmd):
         if not name in self.jobs:
             print "ERROR: Unknown job: %s" % name
             return
-        path = (self.jobs[name].get("storeagepath") +
+        path = (self.jobs[name].get("storagepath") +
                 self.jobs[name].get("userremotedir"))
         if not path.endswith("/"):
             path+="/"
