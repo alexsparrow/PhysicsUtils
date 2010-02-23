@@ -233,7 +233,7 @@ class ICFGridTool(cmd.Cmd):
                            dest,
                            pattern)
 
-    def do_register(self, job):
+    def do_register(self, name):
          if not name in self.jobs:
             print "ERROR: Unknown job: %s" % name
             return
