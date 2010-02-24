@@ -1,4 +1,10 @@
 #!/usr/bin/env python
+
+"""icfGridTool support functions
+
+Much of the logic of the code is in here
+"""
+
 from types import *
 import os
 import os.path
@@ -77,21 +83,19 @@ def setRaw(val, vtype):
         return val
     elif type(val) == StringType:
         if vtype == IntType:
-            return int(value)
+            return int(val)
         elif vtype == BooleanType:
-            if value == "1":
+            if val == "1":
                 return True
-            elif value == "0":
-                self.set(name, False)
+            elif val == "0":
+                return False
             else:
-                msg = "Invalid literal for boolean %s ('%s')" % (name, value)
+                msg = "Invalid literal for boolean ('%s')" %  val
                 raise ValueError(msg)
         else:
-            print str(type(value))
+            print str(type(val))
             print str(vtype)
-            msg = "Invalid literal for %s (%s) : '%s'" % (name,
-                                                       str(vtype),
-                                                       value)
+            msg = "Invalid literal (%s) : '%s'" % (str(vtype), val)
             raise ValueError(msg)
 
 def castorReplace(path):

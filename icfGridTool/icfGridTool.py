@@ -234,12 +234,12 @@ class ICFGridTool(cmd.Cmd):
                            pattern)
 
     def do_register(self, name):
-         if not name in self.jobs:
+        if not name in self.jobs:
             print "ERROR: Unknown job: %s" % name
             return
-         path = raw_input("Enter CASTOR path:")
-         path = castorReplace(path)
-         self.jobs[name].set("outfile", path)
+        path = raw_input("Enter CASTOR path:")
+        path = castorReplace(path)
+        self.jobs[name].set("outfile", path)
 
     def do_clear(self, name):
         if not name in self.jobs:
@@ -255,6 +255,10 @@ class ICFGridTool(cmd.Cmd):
                     rfrm(path+f)
                 else:
                     print "Skipping file %s" % (path+f)
+
+    def do_outfiles(self,arg):
+        for (k,v) in self.jobs.iteritems():
+            print "%s \t %s" % (k,v.get("outfile"))
 
     def do_EOF(self, line):
         self.quit()
