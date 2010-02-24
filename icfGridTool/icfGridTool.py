@@ -258,7 +258,8 @@ class ICFGridTool(cmd.Cmd):
 
     def do_outfiles(self,arg):
         for (k,v) in self.jobs.iteritems():
-            print "%s \t %s" % (k,v.get("outfile"))
+            if not v.get("outfile") == "":
+                print "%s \t %s" % (k,v.get("outfile"))
 
     def do_EOF(self, line):
         self.quit()
