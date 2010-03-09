@@ -83,8 +83,13 @@ def setRaw(val, vtype):
         return val
     elif type(val) == StringType:
         if vtype == IntType:
-            return int(val)
+            try:
+                return int(val)
+            except:
+                msg="Invalid literal for integer ('%s')" % val
+                raise ValueError(msg)
         elif vtype == BooleanType:
+            val=val.strip().rstrip()
             if val == "1":
                 return True
             elif val == "0":
@@ -92,16 +97,18 @@ def setRaw(val, vtype):
             else:
                 msg = "Invalid literal for boolean ('%s')" %  val
                 raise ValueError(msg)
-        else:
-            print str(type(val))
-            print str(vtype)
-            msg = "Invalid literal (%s) : '%s'" % (str(vtype), val)
-            raise ValueError(msg)
+    msg = "Invalid literal (%s) : '%s' (type %s)" % (str(vtype), val,
+                                                     str(type(val)))
+    raise ValueError(msg)
+
 
 def castorReplace(path):
     tmp=path
-    if "CASTOR_HOME" in os.environ:
-        tmp = tmp.replace("~", os.environ["CASTOR_HOME"])
+    if not path.find("~") == -1:
+        if "CASTOR_HOME" in os.environ:
+            tmp = tmp.replace("~", os.environ["CASTOR_HOME"])
+        else:
+            raise Exception("~ used but CASTOR_HOME not defined")
     return tmp
 
 def castorCreate(path):
