@@ -1,5 +1,6 @@
 #!/usr/bin/env python
 from ROOT import *
+import ROOT as r
 import logging
 import itertools
 import sys
@@ -24,12 +25,62 @@ def isdict(ob):
 
 def add_histos(draw):
     h = draw[0]._root.Clone()
-    for i in draw:
+    for i in draw[1:]:
         h.Add(i._root)
     return h
 
+def tdr_hist_style(h1):
+    h = h1._root
+    h.SetTitleFont(42, "XYZ")
+    h.SetTitleSize(0.06, "XYZ")
+    h.SetTitleOffset(0.9, "X")
+    h.SetTitleOffset(1.25, "Y")
+    h.SetLabelFont(42, "XYZ")
+    h.SetLabelOffset(0.007, "XYZ")
+    h.SetLabelSize(0.05, "XYZ")
+
+def div_histos(draw):
+    h = draw[0]._root.Clone()
+    for i in draw[1:2]:
+        h.Divide(h,i._root)
+    return h
+
 def norm_hist(x):
+    if x._root.Integral() == 0:
+        return
+    x._root.Sumw2()
     x._root.Scale(1/x._root.Integral())
+
+class ScaleHist(object):
+    def __init__(self, default=1, scales={}):
+        self._scales = scales
+        self._default = default
+    def __call__(self, x):
+        x._root.Sumw2()
+        if x._idx in self._scales:
+            x._root.Scale(self._scales[x._idx])
+        else:
+            x._root.Scale(self._default)
+
+class AddHist(object):
+    def __init__(self, default=1, scales={}):
+        self._scales = scales
+        self._default = default
+
+    def __call__(self, draw):
+        draw[0]._root.Sumw2()
+        h = draw[0]._root.Clone()
+        h.Scale(self._get_scale(draw[0]))
+        for i in draw[1:]:
+            i._root.Sumw2()
+            h.Add(i._root, self._get_scale(i))
+        return h
+
+    def _get_scale(self, x):
+        if x._idx in self._scales:
+            return self._scales[x._idx]
+        else:
+            return self._default
 
 def splash_screen():
     print "=================================================================="
@@ -59,7 +110,17 @@ class PlotMeister(object):
         self.groups={}
         self._cache={}
         self.virtuals={}
-        gROOT.SetStyle("Plain")
+
+        if not "style" in options:
+            gROOT.SetStyle("Plain")
+        else:
+            if options["style"] == "plain":
+                gROOT.SetStyle("Plain")
+            elif options["style"] == "tdr":
+                r.gROOT.ProcessLine(".L tdrstyle.C")
+                r.setTDRStyle()
+                r.tdrStyle.SetPadRightMargin(0.06)#tweak
+
         if "batch" in options:
             self.SetBatch(options["batch"])
 
@@ -106,6 +167,26 @@ class PlotMeister(object):
         self.virtuals[name]=virtual
         virtual._hook_up(self)
 
+    def Plots(self, name, expand, inputs =[], **opts):
+        pass
+        # groups_ = []
+        # for i in inputs_:
+        #     (u, g) = self.ParseURL(i)
+        #     groups_.append(g)
+        # merged_groups = []
+        # for g in groups_:
+        #     merged_groups.extend(g)
+        # merged_groups = []
+        # for i in inputs:
+        #     (urls, groups) = self.ParseURL(i, expand)
+        #     merged_groups.extend(groups)
+        # for g in merged_groups:
+        #     out = []
+        #     for i in inputs:
+        #         (urls, groups) = self.ParseURL(i, expand)
+        #         if g in groups:
+
+
     def SetBatch(self,batch):
         ROOT.gROOT.SetBatch(batch)
 
@@ -125,7 +206,7 @@ class PlotMeister(object):
                 self.AddVirtual(i.name, i)
         return self
 
-    def ParseURL(self, url):
+    def ParseURL(self, url,expand=[]):
         self._log.debug("Calling ParseURL: %s",url)
         groups = []
         for idx in range(len(url)):
@@ -136,7 +217,7 @@ class PlotMeister(object):
                 group_name=url[idx+2:end]
                 if not group_name in self.groups:
                     raise ValueError("Invalid group name in url %s: %s" % (url,group_name))
-                if not group_name in groups:
+                if not group_name in groups and (len(expand) == 0 or group_name in expand):
                     self._log.debug("Adding group %s", group_name)
                     groups.append(group_name)
         group_repl = []
@@ -260,7 +341,8 @@ class Plot(object):
                                              FCol = 0,
                                              FStyle = 1001,
                                              LWidth = 1,
-                                             Idx = 9999)
+                                             Idx = 9999,
+                                             MStyle = 0)
         if "mapping" in options:
             self._options["mapping"] = options["mapping"]
         if "x_range" in options:
@@ -311,6 +393,10 @@ class Plot(object):
             self._options["x_title"] = options["x_title"]
         if "y_title" in options:
             self._options["y_title"] = options["y_title"]
+        if "legend_border_size" in options:
+            self._options["legend_border_size"] = options["legend_border_size"]
+        if "style_func" in options:
+            self._options["style_func"] = options["style_func"]
 
     def _hook_up(self, meister):
         self._meister = meister
@@ -348,7 +434,7 @@ class Plot(object):
         self._root = TCanvas(self.name)
         if self._options["logy"]:
             self._root.SetLogy()
-        if self._options["margins"]:
+        if "margins" in self._options:
                 self._root.SetLeftMargin(self._options["margins"][0])
                 self._root.SetTopMargin(self._options["margins"][1])
                 self._root.SetRightMargin(self._options["margins"][2])
@@ -359,6 +445,9 @@ class Plot(object):
             i._root.SetLineStyle(self.GetProperty("LStyle",i))
             i._root.SetFillStyle(self.GetProperty("FStyle",i))
             i._root.SetLineWidth(self.GetProperty("LWidth", i))
+            i._root.SetMarkerStyle(self.GetProperty("MStyle", i))
+            if self._options["prep_func"] is not None:
+                self._options["prep_func"](i)
             if "rebin" in self._options:
                 i._root.Rebin(self._options["rebin"])
             if "x_range" in self._options:
@@ -369,8 +458,8 @@ class Plot(object):
                 i._root.GetXaxis().SetTitle(self._options["x_title"])
             if "y_title" in self._options:
                 i._root.GetYaxis().SetTitle(self._options["y_title"])
-            if self._options["prep_func"] is not None:
-                self._options["prep_func"](i)
+            if "style_func" in self._options:
+                self._options["style_func"](i)
             i._root.SetStats(self._options["show_stats"])
         self._drawables.sort(key=self.GetSortIndex)
         if self._options["sweet_max"]:
@@ -390,10 +479,15 @@ class Plot(object):
                                     self._options["legend_pos"][3] )
 
             self._legend.SetFillStyle(self._options["legend_fill_style"])
+            if "legend_border_size" in self._options:
+                self._legend.SetBorderSize(self._options["legend_border_size"])
             for i in self._drawables:
                 self._log.debug("Adding %s to drawables",
                                  self.GetProperty("Txt", i))
-                self._legend.AddEntry(i._root, self.GetProperty("Txt",i),self._options["legend"])
+                legend = self.GetProperty("Leg", i)
+                if legend == "default":
+                    legend = self._options["legend"]
+                self._legend.AddEntry(i._root, self.GetProperty("Txt",i), legend)
             self._legend.Draw()
         if len(self._drawables):
             self._drawables[0]._root.Draw("axis same")
@@ -408,7 +502,8 @@ class Plot(object):
                 if len(self._drawables) == 1:
                     return self._options["mapping"]
                 else:
-                    raise TypeError("Dont be weird")
+                    return self._options["mapping"][i._idx]
+#                    raise TypeError("Dont be weird")
 
         elif isdict(self._options["mapping"]):
             self._log.debug("Mapping is dict")
@@ -422,7 +517,7 @@ class Plot(object):
                     return None
         elif getattr(self._options["mapping"], '__iter__', False) and len(i._groups) == 1:
             self._log.debug("Mapping is iterable")
-            if len(self._options["mapping"] >= len(i._group_repl)):
+            if len(self._options["mapping"]) >= len(i._group_repl):
                 return self._options["mapping"][i._group_repl[0]]
             else:
                 self._log.debug("No mapping found")
@@ -433,11 +528,13 @@ class Plot(object):
     def GetProperty(self, name, i):
         self._log.debug("GetProperty called for %s, %s", name, i._group_repl)
         m = self.GetMap(i)
-        if m is not None and m.has(name):
+        if m is not None and name in m:
             self._log.debug("Got value %s for property %s", str(m.get(name)),name)
             return m.get(name)
         elif name=="Txt":
             return "/".join(i._group_repl)
+        elif name=="Leg":
+            return "default"
         else:
             self._log.debug("Falling back to defaults for %d , %s", i._idx, name)
             return self._options["default"].get(name)
@@ -492,7 +589,7 @@ class Prop(object):
         for (k, v) in self._dict.iteritems():
             if not k in ["LCol", "FCol", "MCol", "LStyle",
                          "FStyle", "MStyle", "Txt", "Draw", "LWidth",
-                         "Idx"]:
+                         "Idx", "Leg"]:
                 raise NameError("Unrecognised property: %s" % k)
 
     def get(self, val):
@@ -502,6 +599,9 @@ class Prop(object):
 
     def has(self, val):
         return val in self._dict
+
+    def __contains__(self, val):
+        return self.has(val)
 
 class Group(object):
     def __init__(self, name, *it, **args):
