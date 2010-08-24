@@ -69,6 +69,7 @@ def se_lcg_ls(path):
         print "\tError occured:"
         print out
         return []
+    files = []
     for line in out.split("\n"):
         files.append(line)
     return files
