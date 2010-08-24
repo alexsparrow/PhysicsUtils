@@ -218,6 +218,7 @@ def add_files():
         for d, p in ds_paths:
             print "Scanning %s for files..." % p
             url = utils.se_path_to_url(p)
+            print url
             files[d] = utils.se_lcg_ls(url)
     else:
         return
