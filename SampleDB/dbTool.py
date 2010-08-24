@@ -10,8 +10,6 @@ class UserQuitError: pass
 db = None
 db_dirty = False
 
-def se_ls(path):
-
 def ui_ansi(s):
     return "%s[%s" % (chr(27), s)
 
@@ -220,7 +218,7 @@ def add_files():
         for d, p in ds_paths:
             print "Scanning %s for files..." % p
             url = utils.se_path_to_url(p)
-            print utils.se_lcg_ls(url)
+            files[d] = utils.se_lcg_ls(url)
     else:
         return
 

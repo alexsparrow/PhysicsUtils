@@ -60,11 +60,12 @@ def se_path_to_node(path):
     return node
 
 def se_lcg_ls(path):
-    import commands
+    import commands,sys
     ret, out = commands.getstatusoutput("lcg-ls %s" % path)
     if ret != 0:
         print "\tError occured:"
         print out
-        sys.exit()
+        return []
     for line in out.split("\n"):
-        yield line
+        files.append(line)
+    return files
