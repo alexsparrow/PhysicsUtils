@@ -7,7 +7,10 @@ def se_std_url(protocol, node_info, path):
     port = ""
     if node_info["%s_port" % protocol] is not None:
         port = ":%d" % node_info["%s_port" % protocol]
-    return "".join([host,port, path])
+    node_path = ""
+    if node_info["%s_path" % protocol] is not None:
+        node_path = node_info["%s_path" % protocol]
+    return "".join([host,port, node_path, path])
 
 def se_rfio_url(protocol, node_info, path):
     return path
