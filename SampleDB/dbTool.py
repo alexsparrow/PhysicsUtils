@@ -2,13 +2,15 @@
 import db2
 import sys
 from pager import Pager
-
+import utils2 as utils
 class InvalidChoiceError: pass
 class UserQuitError: pass
 
 
 db = None
 db_dirty = False
+
+def se_ls(path):
 
 def ui_ansi(s):
     return "%s[%s" % (chr(27), s)
@@ -217,7 +219,8 @@ def add_files():
     if prompt_yes():
         for d, p in ds_paths:
             print "Scanning %s for files..." % p
-            files[d] = se_ls(p)
+            url = utils.se_path_to_url(p)
+            print utils.se_lcg_ls(url)
     else:
         return
 
