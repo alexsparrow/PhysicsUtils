@@ -220,6 +220,7 @@ def add_files():
             url = utils.se_path_to_url(p)
             print url
             files[d] = utils.se_lcg_ls(url)
+            print files
     else:
         return
 
