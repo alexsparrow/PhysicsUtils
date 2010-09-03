@@ -62,13 +62,28 @@ def se_path_to_node(path):
         raise NodeNotFoundError("No node found matching path '%s'." % node)
     return node
 
+
+ls = [
+'/pnfs/hep.ph.ic.ac.uk/data/cms/store/user/rnandi//ICF/automated/2010_06_08_15_01_24//SusyCAF_Tree_9_1.root',
+'/pnfs/hep.ph.ic.ac.uk/data/cms/store/user/rnandi//ICF/automated/2010_06_08_15_01_24//SusyCAF_Tree_5_1.root',
+'/pnfs/hep.ph.ic.ac.uk/data/cms/store/user/rnandi//ICF/automated/2010_06_08_15_01_24//SusyCAF_Tree_2_1.root',
+'/pnfs/hep.ph.ic.ac.uk/data/cms/store/user/rnandi//ICF/automated/2010_06_08_15_01_24//SusyCAF_Tree_3_1.root',
+'/pnfs/hep.ph.ic.ac.uk/data/cms/store/user/rnandi//ICF/automated/2010_06_08_15_01_24//SusyCAF_Tree_1_1.root',
+'/pnfs/hep.ph.ic.ac.uk/data/cms/store/user/rnandi//ICF/automated/2010_06_08_15_01_24//SusyCAF_Tree_10_1.root',
+'/pnfs/hep.ph.ic.ac.uk/data/cms/store/user/rnandi//ICF/automated/2010_06_08_15_01_24//SusyCAF_Tree_6_1.root',
+'/pnfs/hep.ph.ic.ac.uk/data/cms/store/user/rnandi//ICF/automated/2010_06_08_15_01_24//SusyCAF_Tree_4_1.root',
+'/pnfs/hep.ph.ic.ac.uk/data/cms/store/user/rnandi//ICF/automated/2010_06_08_15_01_24//SusyCAF_Tree_8_1.root',
+'/pnfs/hep.ph.ic.ac.uk/data/cms/store/user/rnandi//ICF/automated/2010_06_08_15_01_24//SusyCAF_Tree_7_1.root',
+'/pnfs/hep.ph.ic.ac.uk/data/cms/store/user/rnandi//ICF/automated/2010_06_08_15_01_24//SusyCAF_Tree_11_1.root']
+
 def se_lcg_ls(path):
     import commands,sys
+
     ret, out = commands.getstatusoutput("lcg-ls %s" % path)
     if ret != 0:
         print "\tError occured:"
         print out
-        return []
+        return ls
     files = []
     for line in out.split("\n"):
         files.append(line)

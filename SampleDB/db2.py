@@ -12,6 +12,7 @@ icf_sample = [
 icf_version = [
     ("name" , "TEXT NOT NULL"),
     ("job_id" , "INTEGER NOT NULL"),
+    ("subjob", "INTEGER NOT NULL"),
     ("icf_sample_id" , "INTEGER NOT NULL"),
     ("int_lumi" , "REAL"),
     ("comment" , "TEXT"),
@@ -21,6 +22,7 @@ icf_version = [
 
 icf_file = [
     ("job_id" , "INTEGER NOT NULL"),
+    ("subjob", "INTEGER NOT NULL"),
     ("location" , "TEXT NOT NULL"),
     ("path" , "TEXT NOT NULL"),
     ("events" , "INTEGER")
@@ -147,16 +149,21 @@ class DB(object):
                                       latest,
                                       dbs)).lastrowid
 
-    def add_version(self, sample, name, job, int_lumi=-1,
-                    comment = "", created_by = "", created_date = ""):
+    def add_version(self, sample, name, job, subjob, int_lumi=-1,
+                    comment = "", created_by = getpass.getuser(), created_date = time.asctime()):
         sql = insert_sql("icf_version", icf_version)
         return self._db.execute(sql, (name,
                                       job,
+                                      subjob,
                                       sample,
                                       int_lumi,
                                       comment,
                                       created_by,
                                       created_date)).lastrowid
+
+    def add_file(self, job_id, subjob, location, path, events):
+        sql = insert_sql("icf_file", icf_file)
+        return self._db.execute(sql, (job_id, subjob, location, path, events)).lastrowid
 
     @needs_lock
     def update(self, rid, field, value):

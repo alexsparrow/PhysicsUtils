@@ -31,7 +31,7 @@ class DB(object):
                 available_versions = self._list_versions(rowid)
                 raise VersionNotFoundError(name, version , available_versions)
             jobs = self._find_jobs(versions)
-            files.append(self._find_files(jobs))
+            files.extend((f[1], f[2]) for f in self._find_files(jobs))
         return files
 
     def _version_info(self, s, version):
@@ -57,7 +57,7 @@ class DB(object):
                 if e.version is None:
                     print  "There is no version of sample '%s' marked as LATEST. Please correct the db or explicitly specify a version to use." % e.sample
                 else:
-                    print "No version of sample %s matching %s" (e.sample, e.version)
+                    print "No version of sample %s matching %s" % (e.sample, e.version)
                 print "Available Versions:"
                 for v in e.available_versions:
                     print v
@@ -155,22 +155,25 @@ select distinct icf_version.name from icf_version, icf_sample where icf_version.
 
 
     def _find_jobs(self, version):
-        sql = "select job.rowid, icf_version.job_id, icf_version.rowid from icf_version, job where job.rowid = icf_version.job_id"
+        sql = "select job.rowid, icf_version.job_id, icf_version.subjob, icf_version.rowid from icf_version, job where job.rowid = icf_version.job_id"
         sql += " and (" +"or".join(["icf_version.rowid = ?"]) + ")"
         rows = self._db.execute(sql, tuple(version))
-        return [r["rowid"] for r in rows]
+        return [(r["rowid"], r["subjob"]) for r in rows]
 
     def _find_files(self, job, location=None):
-        sql = "select icf_file.rowid, icf_file.job_id, job.rowid from icf_file, job where icf_file.job_id = job.rowid"
-        sql += " and (" + "or".join(["job.rowid =?"])+")"
+        sql = "select icf_file.rowid, icf_file.path, icf_file.events, icf_file.job_id, job.rowid, icf_file.subjob  from icf_file, job where icf_file.job_id = job.rowid"
+        sql += " and (" + "or".join(["job.rowid =? and icf_file.subjob = ?"])+")"
+        jobs = []
+        for j in job:
+            jobs.extend(j)
         if location:
             sql += " and icf_file.location = ?"
-            job.append(location)
-        rows = self._db.execute(sql, tuple(job))
-        return [(r["icf_file.rowid"], r["icf_file.path"], r["icf_file.events"]) for r in rows]
+            jobs.append(location)
+        rows = self._db.execute(sql, jobs)
+        return [(r["rowid"], r["path"], r["events"]) for r in rows]
 
     def _job_info(self, job):
-        row = self._db.execute("select tag.susycaf from tag, job where job.rowid = ? and job.tagid = tag.rowid", (job,)).fetchone()
+        row = self._db.execute("select tag.susycaf from tag, job where job.rowid = ? and job.tagid = tag.rowid", (job[0],)).fetchone()
         info = {"susycaf_tag":row["susycaf"]}
         return info
 
@@ -199,4 +202,6 @@ def sample_db(self, db, method="sqlite_afs"):
 
 if __name__ == "__main__":
         db = SQLiteDB("sqlite.test.db")
-        print db.sample("ert","ert")
+        s = db.sample("/QCD/Pt15", "Sweet")
+        for f in s["files"]:
+            print f

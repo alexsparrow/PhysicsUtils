@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 import db2
-import sys
+import sys, os, subprocess, tempfile
 from pager import Pager
 import utils2 as utils
 class InvalidChoiceError: pass
@@ -21,6 +21,22 @@ def ui_bold(s):
 
 def ui_red(s):
     return ui_ansi("31m") + s + ui_ansi("0m")
+
+def ui_edit(lines):
+    (fd, tempf) = tempfile.mkstemp()
+    try:
+        f = os.fdopen(fd, "w")
+        f.write("\n".join(lines))
+        f.close()
+        ed = "nano"
+        if "EDITOR" in os.environ:
+            ed = os.environ["EDITOR"]
+        subprocess.call([ed, tempf])
+        f = open(tempf, "r")
+        f.read().split("\n")
+    finally:
+        os.unlink(tempf)
+    return lines
 
 def prompt_retry(func):
     def newfunc(*args, **kwds):
@@ -46,7 +62,7 @@ def prompt_name(prompt, table):
                         (name,)):
         print "This name already exists in the DB"
         raise InvalidChoiceError
-    if name == "" or name[0]!="/":
+    if name == "":
         print "Invalid name"
         raise InvalidChoiceError
     return name
@@ -155,9 +171,9 @@ def add_version():
                                "{rowid:<6} {name:<20} {created_date:<10} {created_by:<10}",
                                ["name"], sample[0])
 
-        for j in db.execute("select rowid, job_id, name, int_lumi from icf_version where name=?",
+        for j in db.execute("select rowid, job_id, name, int_lumi, subjob from icf_version where name=?",
                             version):
-            jobs.append((j["rowid"], j["int_lumi"]))
+            jobs.append((j["rowid"], j["int_lumi"], j["subjob"]))
     finished = False
     filter_dbs = raw_input("Filter by DBS: ")
     while not finished:
@@ -165,13 +181,20 @@ def add_version():
         if filter_dbs:
             sql += " and dset.dataset LIKE ?"
             job = prompt_pager("Please choose a job", sql,
-                               "{rowid:<6} {user:<10} {state:<10} {dataset:<20} {susycaf:<10} {rpath:<30}", ["rowid"], filter_dbs+"%")
+                               "{rowid:<6} {user:<10} {state:<10} {dataset:<20} {susycaf:<10} {rpath:<30}", ["rowid", "dataset"], filter_dbs+"%")
         else:
             job = prompt_pager("Please choose a job", sql,
-                               "{rowid:<6} {user:<10} {state:<10} {dataset:<20} {susycaf:<10} {rpath:<30}")
-        print "Added job # %d" % job[0]
-        int_lumi = prompt_numeric("Integrated Luminosity: ", float)
-        jobs.append((job[0],int_lumi))
+                               "{rowid:<6} {user:<10} {state:<10} {dataset:<20} {susycaf:<10} {rpath:<30}", ["rowid", "dataset"])
+        subjob = 0
+        if len(job[1].split(",")) > 1:
+            print "This job contains several subjobs"
+            print "Please choose which subjob"
+            subjob = Pager("Choose subjob", job1.split(",")).sel_idx
+            if subjob == -1:
+                return
+        print "Added job # %d (subjob # %d)" % (job[0], subjob)
+        int_lumi = prompt_numeric("Integrated Luminosity: ", float, -1)
+        jobs.append((job[0],int_lumi, subjob))
         print "Finished adding jobs?"
         finished = prompt_yes()
     print "Should this be the recommended version?"
@@ -183,7 +206,7 @@ def add_version():
                    "Recommended" : recommended}):
         try:
             for j in jobs:
-                db.add_version(sample[0], name, j[0])
+                db.add_version(sample[0], name, j[0], j[2])
             if recommended:
                 db.update(sample[0], "icf_sample.latest_version", name)
             print "DONE"
@@ -201,29 +224,40 @@ def add_files():
                            "{rowid:<6} {user:<10} {state:<10} {dataset:<20} {susycaf:<10} {rpath:<30}", ["rowid", "rpath", "dataset"], filter_dbs+"%")
     else:
         job = prompt_pager("Please choose a job", sql,
-                           "{rowid:<6} {user:<10} {state:<10} {dataset:<20} {susycaf:<10} {rpath:<30}")
+                           "{rowid:<6} {user:<10} {state:<10} {dataset:<20} {susycaf:<10} {rpath:<30}",  ["rowid", "rpath", "dataset"])
     ds_paths = []
     if len(job[2].split(",")) == 1:
-        ds_paths = [(job[2],job[1])]
+        ds_paths = [(0, job[2],job[1])]
     else:
-        for d in job[2].split(","):
-            ds_paths.append((d,job[1]+"/"+d[1:].replace("/", ".")))
+        for i, d in enumerate(job[2].split(",")):
+            ds_paths.append((i, d, job[1]+"/"+d[1:].replace("/", ".")))
     print "You have chosen job: %d" % job[0]
     print "{0:<40} {1:<40}".format("Dataset", "Path")
-    for d, p in ds_paths:
+    for i, d, p in ds_paths:
         print "{0:<40} {1:<40}".format(d,p)
     print "Scan for files?"
-    files = {}
+    files = []
     if prompt_yes():
-        for d, p in ds_paths:
+        for i, d, p in ds_paths:
+            print "="*70
             print "Scanning %s for files..." % p
+            print "="*70
             url = utils.se_path_to_url(p)
-            print url
-            files[d] = utils.se_lcg_ls(url)
-            print files
-    else:
-        return
-
+            flist = utils.se_lcg_ls(url)
+            flist = ui_edit(flist)
+            print "This subjob has %d files" % len(flist)
+            print "Are you sure you want to add them to the DB?"
+            if prompt_yes():
+                for f in flist:
+                    db.add_file(job[0], i, utils.se_path_to_node(f), f, -1)
+                print "Done"
+            else:
+                print "Subjob %s not added" % d
+        lines = []
+        for d, f in files:
+            lines.extend(f)
+        ui_edit(lines)
+    print
 
 def lock_db():
     global db
