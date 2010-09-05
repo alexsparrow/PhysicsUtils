@@ -5,6 +5,7 @@ from utils import prompt_retry, prompt_type, confirm_create
 from pager import Pager
 import sys
 import utils2 as utils
+import ROOT as r
 
 @prompt_retry
 def prompt_sample(store):
@@ -82,7 +83,20 @@ if __name__ == "__main__":
             files.extend(utils.se_lcg_ls(utils.se_path_to_url(path)))
         print "Files found:"
         for f in files:
-            print f
+            print utils.se_path_to_url(f, "dcap")	
+	    f = r.TDCacheFile(utils.se_path_to_url(f, "dcap"))
+	    if f is None:
+		continue
+	    d = f.Get("susyTree")
+	    if d is None:
+		print "Directory not found"
+	        continue
+	    t = d.Get("tree")
+	    if t is None:
+		print "tree not found"
+                continue
+            print t.GetEntriesFast()
+	    print f.Get("susyTree").Get("tree").GetEntriesFast()
         print "Add?"
         if raw_input() == "y":
             blocks.append({"job":j[0],

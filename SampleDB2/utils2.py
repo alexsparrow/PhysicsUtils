@@ -23,6 +23,7 @@ se_path_url_map = {
         "srm_port" : 8443,
         "dcap_port" : 22128,
         "srm_path" : "/srm/managerv2?SFN=",
+	"dcap_path" : None,
         "supports" : ["srm", "dcap"]
         },
     "CASTOR" : {
