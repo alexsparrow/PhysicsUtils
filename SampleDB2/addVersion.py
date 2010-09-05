@@ -5,7 +5,6 @@ from utils import prompt_retry, prompt_type, confirm_create
 from pager import Pager
 import sys
 import utils2 as utils
-import ROOT as r
 
 @prompt_retry
 def prompt_sample(store):
@@ -79,14 +78,13 @@ if __name__ == "__main__":
             path = j[3] + '/' + string.replace(j[1][1:], '/', '.')
         print "Scan path '%s for files?" % path
         files = []
+        file_counts = {}
         if raw_input() == "y":
             files.extend(utils.se_lcg_ls(utils.se_path_to_url(path)))
-        print "Files found:"
-        for f in files:
-            print f
+        print "Files found: %d" % len(files)
         print "Scan for event counts?"
         if raw_input() == "y":
-            file_counts = {}
+            import ROOT as r
             for idx, f in enumerate(files):
                 print "*"*60
                 print "Scanning file (%d of %d): %s" % (idx,
@@ -105,12 +103,23 @@ if __name__ == "__main__":
                     continue
                 file_counts[idx] = t.GetEntriesFast()
                 print "Contains %d events" % file_counts[idx]
+        file_info = []
+        total_events = 0
+        for idx, f in enumerate(files):
+            if idx in file_counts:
+                n = file_counts[idx]
+                total_events += n
+            else:
+                n = -1
+            file_info.append({"path" : f,
+                              "events" : n})
         print "Add?"
         if raw_input() == "y":
             blocks.append({"job":j[0],
                            "dataset": j[1].split(",")[sub],
-                           "files" : files,
-                           "node" : utils.se_path_to_node(path)})
+                           "files" : file_info,
+                           "node" : utils.se_path_to_node(path),
+                           "events" : total_events})
         print "Add more jobs?"
         if raw_input() != "y":
             break
