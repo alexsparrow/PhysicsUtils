@@ -83,20 +83,28 @@ if __name__ == "__main__":
             files.extend(utils.se_lcg_ls(utils.se_path_to_url(path)))
         print "Files found:"
         for f in files:
-            print utils.se_path_to_url(f, "dcap")	
-	    f = r.TDCacheFile(utils.se_path_to_url(f, "dcap"))
-	    if f is None:
-		continue
-	    d = f.Get("susyTree")
-	    if d is None:
-		print "Directory not found"
-	        continue
-	    t = d.Get("tree")
-	    if t is None:
-		print "tree not found"
-                continue
-            print t.GetEntriesFast()
-	    print f.Get("susyTree").Get("tree").GetEntriesFast()
+            print f
+        print "Scan for event counts?"
+        if raw_input() == "y":
+            file_counts = {}
+            for idx, f in enumerate(files):
+                print "*"*60
+                print "Scanning file (%d of %d): %s" % (idx,
+                                                        len(files),
+                                                        utils.se_path_to_url(f, "dcap"))
+                f = r.TDCacheFile(utils.se_path_to_url(f, "dcap"))
+                if f is None:
+                    continue
+                d = f.Get("susyTree")
+                if d is None:
+                    print "Directory not found"
+                    continue
+                t = d.Get("tree")
+                if t is None:
+                    print "tree not found"
+                    continue
+                file_counts[idx] = t.GetEntriesFast()
+                print "Contains %d events" % file_counts[idx]
         print "Add?"
         if raw_input() == "y":
             blocks.append({"job":j[0],
