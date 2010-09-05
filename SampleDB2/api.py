@@ -9,7 +9,7 @@ def sample(name,
            version=None,
            n_events = -1,
            format = ("ICF", 2),
-           path="/vols/cms02/as1604/db/PhysicsUtils/SampleDB2/test_store",
+           path="/vols/cms02/as1604/PhysicsUtils/SampleDB2/store",
 	   node = "IC_DCACHE"
 	):
     store = openStore(path)
