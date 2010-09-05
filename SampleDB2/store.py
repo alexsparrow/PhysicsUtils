@@ -130,7 +130,7 @@ def openStore(path, **opts):
 
 
 if __name__ == "__main__":
-    store = openStore(store, create=True, lock=True)
+    store = openStore("./test_store", create=True, lock=True)
     with store.Create("/EG/_sample_.json") as j:
         j.name = "/EG"
         j.cross_section = -1
