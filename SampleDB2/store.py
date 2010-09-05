@@ -119,12 +119,12 @@ class JSONStore:
 
 def openStore(path, **opts):
     try:
-        return JSONStore("./test_store", **opts)
+        return JSONStore(path, **opts)
     except StoreLockedError, e:
         print "JSON Store locked by user %s for %d minutes" % (e.user, (time.time() - e.time)/60)
         print "Break the lock? [n]"
         if raw_input() == "y":
-            return JSONStore("./test_store", lock = True, break_lock = True)
+            return JSONStore(path, lock = True, break_lock = True)
         else:
             raise
 
