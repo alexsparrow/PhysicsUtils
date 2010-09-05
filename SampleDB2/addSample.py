@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 from store import openStore, JSONCancelError
 from config import conf
-from utils import prompt_retry, prompt_type, confirm_create
+from utils import prompt_retry, prompt_type, confirm_create, InvalidChoiceError
 
 @prompt_retry
 def prompt_sample_name(store):
