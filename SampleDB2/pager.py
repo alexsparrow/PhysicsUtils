@@ -89,7 +89,10 @@ class Pager(object):
 
     def main(self, stdscr):
         self._screen = stdscr.subwin(0, 0)
-#        curses.curs_set(0)
+        try:
+            curses.curs_set(0)
+        except:
+            pass
         curses.noecho()
         self._screen.keypad(1)
         while True:
