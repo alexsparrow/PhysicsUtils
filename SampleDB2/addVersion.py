@@ -3,7 +3,7 @@ from store import openStore, JSONCancelError
 from config import conf
 from utils import prompt_retry, prompt_type, confirm_create
 from pager import Pager
-import sys
+import sys, readline
 import utils2 as utils
 
 @prompt_retry

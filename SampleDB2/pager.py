@@ -1,10 +1,6 @@
 #/usr/bin/env python
 import curses
-import logging
-import termios, sys
-LOG_FILENAME = 'example.log'
-logging.basicConfig(filename=LOG_FILENAME,level=logging.DEBUG)
-
+import termios, sys, readline
 
 class Pager(object):
     def __init__(self, prompt, inputs, per_page = None, empty_text = "Empty!"):
@@ -93,7 +89,7 @@ class Pager(object):
 
     def main(self, stdscr):
         self._screen = stdscr.subwin(0, 0)
-        curses.curs_set(0)
+#        curses.curs_set(0)
         curses.noecho()
         self._screen.keypad(1)
         while True:
@@ -101,8 +97,6 @@ class Pager(object):
                 self.repaint()
                 self._dirty = False
             key = self._screen.getch()
-            logging.debug(key)
-            logging.debug(curses.KEY_DOWN)
             if key == ord("q"):
                 self.sel_idx = -1
                 break
