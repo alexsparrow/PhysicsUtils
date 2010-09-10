@@ -7,18 +7,21 @@ def usage():
     sys.exit(1)
 
 if __name__ == "__main__":
-    parser = OptionParser()
+    parser = OptionParser(usage="usage: %prog [options] <outfile> <infile1> <infile2> ...")
     parser.add_option("-l","--loop",action="store_true",
                       default=False, help='Carry on hadding')
 
     (options, args) = parser.parse_args()
     if len(args) < 2:
-        usage()
+        print "ERROR: Need at least 2 arguments"
+        print
+        parser.print_help()
+        sys.exit(1)
     finished = False
     while not finished:
         finished = True
-        ofile = args[1]
-        ifiles = [f for f in args[2:]]
+        ofile = args[0]
+        ifiles = [f for f in args[1:]]
         json_path = args[1].replace("root","json")
 
         if not os.path.exists(json_path):
@@ -38,7 +41,7 @@ if __name__ == "__main__":
                 action = "TOOSMALL"
                 if options.loop:
                     finished = False
-            print "File {0:<70} [{1:<10}]".format(f, action)
+            print "File {0:<70} [{1:^10}]".format(f, action)
         if len(afiles) == 0:
             print "Up to date!"
             sys.exit(0)
