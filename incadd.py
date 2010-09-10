@@ -38,7 +38,7 @@ if __name__ == "__main__":
                 action = "TOOSMALL"
                 if options.loop:
                     finished = False
-            print "File {0:<40} {1:<10}".format(f, action)
+            print "File {0:<70} [{1:<10}]".format(f, action)
         if len(afiles) == 0:
             print "Up to date!"
             sys.exit(0)
