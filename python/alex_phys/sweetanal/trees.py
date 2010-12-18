@@ -71,7 +71,11 @@ class TreeHelper:
         if self._use_cache:
             self._tree.SetCacheSize(10000000)
             self._tree.SetCacheLearnEntries(5)
-        for b in self._tree.GetListOfBranches():
+
+	# Minor workaround to a bug that seems to be in ROOT 5.27/06
+        branch_list = self._tree.GetListOfBranches()
+        for i in range(self._tree.GetNbranches()):
+            b = branch_list[i]
             branchName = b.GetName()
             if branchName in ignore_branches:
                 continue
