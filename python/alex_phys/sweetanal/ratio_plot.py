@@ -83,6 +83,7 @@ class RatioPlot:
             "hist_xrange" : None,
             "hist_ytitle" : "",
             "hist_add_title_label" : True,
+            "ratio_ytitle" : "data / mc",
             "unity_line_wdith" : 2,
             "unity_line_color" : 2,
             "unity_fill_color" : 2,
@@ -218,7 +219,7 @@ class RatioPlot:
 
         bottom = total.Clone()
         top = self._hist_data.Clone()
-        top.GetYaxis().SetTitle("data / sim")
+        top.GetYaxis().SetTitle(self._conf["ratio_ytitle"])
         #top.GetXaxis().SetTitle("")
         top.SetTitle("")
         top.Divide(bottom)
