@@ -75,6 +75,9 @@ class RatioPlot:
             "hist_xmax_factor" : 1.1,
             "hist_xfixed" : False,
             "hist_yfixed" : False,
+            "hist_xrange" : None,
+            "hist_ytitle" : "",
+            "hist_add_title_label" : True,
             "unity_line_wdith" : 2,
             "unity_line_color" : 2,
             "unity_fill_color" : 2,
@@ -165,14 +168,16 @@ class RatioPlot:
                  self.max_x(self._hist_data)])])*self._conf["hist_xmax_factor"]
         max_y =  self._conf["hist_ymax_factor"]*max([self.max_y(total),
                                                      self.max_y(self._hist_data)])
-
+        if self._conf["hist_xrange"] is not None:
+            (min_x, max_x) = self._conf["hist_xrange"]
         if not self._conf["hist_xfixed"]:
             error.GetXaxis().SetRangeUser(min_x, max_x)
         if not self._conf["hist_yfixed"]:
-            error.GetYaxis().SetRangeUser(0.001, max_y)
+                error.GetYaxis().SetRangeUser(0.001, max_y)
+
         error.SetTitle("")
         error.GetXaxis().SetTitle(self.name)
-#        error.GetYaxis().SetTitle("# Events")
+        error.GetYaxis().SetTitle(self._conf["hist_ytitle"])
 
         error.Draw("hist")
         central.Draw("hist same")
@@ -180,7 +185,8 @@ class RatioPlot:
         for name, hist in self._hist_mc.iteritems():
             hist.Draw("hist same")
         self._hist_data.Draw("9SAMEP")
-        self._labels.append((0.05, 0.95, self.name))
+        if self._conf["hist_add_title_label"]:
+            self._labels.append((0.05, 0.95, self.name))
         for x, y, text in self._labels:
             l = r.TLatex()
             l.SetNDC()
