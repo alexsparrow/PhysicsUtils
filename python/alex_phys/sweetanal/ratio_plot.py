@@ -69,6 +69,11 @@ class RatioPlot:
             "leg_loc" : "left",
             "leg_pos" : (0.12, 0.55, 0.6, 0.88),
 
+            "margin_left" : None,
+            "margin_right" : None,
+            "margin_top" : None,
+            "margin_bottom" : 0.15,
+
             "hist_xmin" : 0,
             "hist_xmax" : 500,
             "hist_ymax_factor" : 1.5,
@@ -135,11 +140,17 @@ class RatioPlot:
         mainpad = r.TPad("", "", 0.01, 0.25, 0.99, 0.99)
         #mainpad.SetLogy()
         mainpad.SetNumber(1)
-        mainpad.SetBottomMargin(0.15)
+        if self._conf["margin_bottom"] is not None:
+            mainpad.SetBottomMargin(self._conf["margin_bottom"])
+        if self._conf["margin_left"] is not None:
+            mainpad.SetLeftMargin(self._conf["margin_left"])
         mainpad.Draw()
         ratiopad = r.TPad("", "", 0, 0.05, 0.99, 0.26)
         ratiopad.SetNumber(2)
-        ratiopad.SetBottomMargin(0.15) # was 0.3
+        if self._conf["margin_bottom"] is not None:
+            ratiopad.SetBottomMargin(self._conf["margin_bottom"]) # was 0.3
+        if self._conf["margin_left"] is not None:
+            ratiopad.SetLeftMargin(self._conf["margin_left"])
         ratiopad.Draw()
         c.cd(1)
         self.stylise(self._hist_data, "data")
